@@ -33,10 +33,22 @@ const MEMBER_DATA_KEYS = ["username", "password", "phoneNumber", "email"];
 const LOGIN_DATA_KEYS = ["username", "password"];
 const USERS_KEYS = ["username", "birthday", "weight", "height"];
 
+webServer.post("/checkEmail", async (req, res) => {
+  let body = req.body;
+  const userExist = await databaseClient
+    .db()
+    .collection("members")
+    .findOne({ email: body.email });
+  if (userExist) {
+    return res.json({ isEmailExist: true });
+  } else {
+    return res.json({ isEmailExist: false });
+  }
+});
+
 webServer.post("/signup", async (req, res) => {
   let body = req.body;
   const missingFields = await checkMissingFields(body, MEMBER_DATA_KEYS);
-
   if (missingFields.length > 0) {
     return res.status(400).json({
       message: "Validation failed. The following fields are missing values:",
@@ -48,7 +60,7 @@ webServer.post("/signup", async (req, res) => {
   body["password"] = await bcrypt.hash(body["password"], saltRound);
 
   await databaseClient.db().collection("members").insertOne(body);
-  res.send("Create User Successfully");
+  res.json({ message: "Create User Successfully", isEmailDuplicated: false });
 });
 
 webServer.post("/login", async (req, res) => {
@@ -138,7 +150,7 @@ webServer.post("/activityInfoGetData", jwtValidate, async (req, res) => {
 
 webServer.post("/activityInfoChartDonut", jwtValidate, async (req, res) => {
   try {
-    console.log("selectedDate for Donut",req.body.selectedDate);
+    console.log("selectedDate for Donut", req.body.selectedDate);
     const user_id = req.body.user_id;
     let selectedDate = req.body.selectedDate;
     selectedDate = new Date(selectedDate).toLocaleDateString();
@@ -149,7 +161,7 @@ webServer.post("/activityInfoChartDonut", jwtValidate, async (req, res) => {
     if (selectedDate.getDay() === 0) {
       // console.log("sunday");
       requestedWeek += 1;
-    } 
+    }
     const activityInfo = await databaseClient
       .db()
       .collection("activityInfo")
@@ -163,7 +175,7 @@ webServer.post("/activityInfoChartDonut", jwtValidate, async (req, res) => {
         {
           $match: {
             user_id: user_id,
-            weekOfYear: { $eq: requestedWeek - 1},
+            weekOfYear: { $eq: requestedWeek - 1 },
           },
         },
         {
@@ -195,7 +207,7 @@ webServer.post("/activityInfoChartBar", jwtValidate, async (req, res) => {
     if (selectedDate.getDay() === 0) {
       // console.log("sunday");
       requestedWeek += 1;
-    } 
+    }
     const activityInfoChartBar = await databaseClient
       .db()
       .collection("activityInfo")
