@@ -116,22 +116,6 @@ webServer.post("/login", async (req, res) => {
   }
 });
 
-webServer.get("/testToken", jwtValidate, async (req, res) => {
-  // try {
-  //   if (!req.headers["authorization"]) {
-  //     return res.sendStatus(401);
-  //   }
-  // const token = req.headers["authorization"].replace("Bearer ","");
-  // console.log(token);
-  // const ret = jwt.verify(token, process.env.JWT_SECRET_KEY);
-  // res.json(ret);
-  // } catch (e) {
-  //   return res.sendStatus(403);
-  // }
-  console.log("token validate passed");
-  res.send("token validate passed");
-});
-
 webServer.post("/activityInfoGetData", jwtValidate, async (req, res) => {
   console.log(req.body.selectedDate);
   const user_id = req.body.user_id;
