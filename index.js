@@ -33,6 +33,19 @@ const MEMBER_DATA_KEYS = ["username", "password", "phoneNumber", "email"];
 const LOGIN_DATA_KEYS = ["username", "password"];
 const USERS_KEYS = ["username", "birthday", "weight", "height"];
 
+webServer.post("/checkUsername", async (req, res) => {
+  let body = req.body;
+  const userExist = await databaseClient
+    .db()
+    .collection("members")
+    .findOne({ username: body.username });
+  if (userExist) {
+    return res.json({ isUsernameExist: true });
+  } else {
+    return res.json({ isUsernameExist: false });
+  }
+});
+
 webServer.post("/checkEmail", async (req, res) => {
   let body = req.body;
   const userExist = await databaseClient
